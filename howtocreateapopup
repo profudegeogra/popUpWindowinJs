@@ -1,0 +1,172 @@
+<!DOCTYPE html> <!-- Specifică tipul documentului (HTML5) -->
+<html lang="en"> <!-- Declară limba documentului ca engleză -->
+<head>
+  <meta charset="UTF-8" /> <!-- Setează codificarea caracterelor ca UTF-8 -->
+  <meta name="viewport" content="width=device-width, initial-scale=1" /> <!-- Asigură un layout responsive pe dispozitive mobile -->
+  <title>Pop-up Example</title> <!-- Titlul paginii din tab -->
+  
+  <style>
+    body {
+      background-color: burlywood; /* Culoare de fundal */
+      margin: 0; /* Elimină marginea implicită */
+      font-family: Arial, sans-serif; /* Setează fontul paginii */
+    }
+
+    #overlay {
+      position: fixed; /* Rămâne fix pe ecran */
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: green;
+      opacity:0.4;
+      display: none; /* Este ascuns la început */
+      z-index: 999; /* Apare sub popup, dar peste restul paginii */
+    }
+
+    #PopUpWindow {
+      background-color: coral; /* Fundalul pop-up-ului */
+      color: antiquewhite; /* Culoarea textului */
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%); /* Centrează pop-up-ul pe ecran */
+      display: flex; /* Flex layout pentru conținutul intern */
+      flex-direction: column; /* Elementele se aliniază vertical */
+      width: 90%;
+      max-width: 600px; /* Lățime maximă */
+      padding: 20px; /* Spațiu interior */
+      border-radius: 10px; /* Colțuri rotunjite */
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.5); /* Umbră pentru efect vizual */
+      z-index: 1000; /* Apare peste overlay */
+      opacity: 0; /* Inițial invizibil (pentru animație) */
+      transition: opacity 0.5s ease; /* Tranziție lină la afișare */
+    }
+
+    #PopUpWindow.show {
+      opacity: 1; /* Face popup-ul complet vizibil */
+      transform: scale(1); /* Asigură că e la scară normală */
+    }
+
+    #closeButton {
+      align-self: center; /* Centrează butonul */
+      margin-top: 15px; /* Spațiu deasupra */
+      border-radius: 20px; /* Colțuri rotunjite */
+      background-color: green; /* Culoare fundal */
+      color: white; /* Culoare text */
+      width: 120px; /* Lățime fixă */
+      padding: 10px; /* Spațiu interior */
+      font-size: 1rem; /* Dimensiune font */
+      cursor: pointer; /* Cursor pointer pe hover */
+      border: none; /* Fără chenar */
+    }
+
+    #closeButton:hover {
+      background-color: darkgreen; /* Schimbă culoarea la hover */
+    }
+
+
+    /* Efect de dispariție treptată și blur */
+.overlay-disappear {
+  animation: disappearOverlay 0.6s forwards;
+}
+
+@keyframes disappearOverlay {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0px);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(1.1);
+    filter: blur(2px);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.2);
+    filter: blur(5px);
+  }
+}
+
+  </style>
+</head>
+
+<body>
+
+  <div id="overlay"></div> <!-- Overlay transparent de fundal pentru pop-up -->
+
+  <main>
+    <h1 style="text-align: center;">WELCOME TO MY WEBPAGE</h1> <!-- Titlul paginii -->
+    <div>
+      <p>The lion (Panthera leo) is a large cat...</p> <!-- Text informativ -->
+      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c6/Okonjima_Lioness.jpg/250px-Okonjima_Lioness.jpg" alt="Lioness"> <!-- Imagine -->
+    </div>
+  </main>
+
+  <div id="PopUpWindow"> <!-- Fereastra pop-up -->
+    <h3>Popup Example: Terms and Rules</h3>
+    <p>Rule 1: Be kind.</p>
+    <p>Rule 2: Stay on topic.</p>
+    <p>Rule 3: No spam.</p>
+    <p>Rule 4: Respect others.</p>
+    <button id="closeButton">Close</button> <!-- Butonul de închidere -->
+  </div>
+
+  <script>
+    let popupShown = false; // Variabilă care reține dacă popup-ul a fost afișat deja
+
+    const popup = document.getElementById("PopUpWindow"); // Referință către popup
+    const overlay = document.getElementById("overlay"); // Referință către overlay
+    const closeBtn = document.getElementById("closeButton"); // Referință către butonul de închidere
+
+    // Ascunde pop-up-ul la început
+    popup.style.display = "none";
+
+    function displayPopUp() {
+      if (!popupShown) { // Verifică dacă nu a mai fost afișat
+        popup.style.display = "flex"; // Afișează popup-ul (devine vizibil)
+        overlay.style.display = "block"; // Afișează overlay-ul de fundal
+
+    // Adaugă clasa "show" după o scurtă întârziere pentru a permite reflow
+    setTimeout(() => {
+      popup.classList.add("show");
+    }, 10); // 10ms este suficient pentru majoritatea browserelor
+
+        popupShown = true; // Marchează că a fost afișat
+      }
+    }
+
+function closePopUp() {
+  popup.classList.remove("show");
+
+  // Adaugă clasa de animație pe overlay
+  overlay.classList.add("overlay-disappear");
+
+  // După ce animația se termină, ascunde complet overlay-ul
+  setTimeout(() => {
+    overlay.style.display = "none";
+    overlay.classList.remove("overlay-disappear"); // Reset pentru viitoare deschideri
+    popup.style.display = "none";
+  }, 600); // Trebuie să se potrivească cu durata animației
+}
+
+
+    // Afișează pop-up-ul după 3 secunde de la încărcarea paginii
+    setTimeout(displayPopUp, 3000);
+
+    // Adaugă eveniment de click pe butonul de închidere
+    closeBtn.addEventListener("click", closePopUp);
+
+    // Închide pop-up-ul și când se apasă pe overlay
+    overlay.addEventListener("click", closePopUp);
+
+    // Închide pop-up-ul la apăsarea tastei ESC
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        closePopUp();
+      }
+    });
+  </script>
+</body>
+</html>
